@@ -297,7 +297,7 @@ namespace DDTankFlashDownloader
                 // Download Ui
                 foreach (string file in listLang.Items)
                 {
-                    string url = $"{txtFlashUrl.Text}ui\\{txtFlashLang.Text}\\{file}";
+                    string url = $"{txtFlashUrl.Text.TrimEnd('/')}/ui/{txtFlashLang.Text}/{file}";
                     string localPath = Path.Combine(Application.StartupPath, "Downloads", txtFlashName.Text, "ui", txtFlashLang.Text, file);
                     await DownloadFileSafeAsync(webClient, url, localPath);
                     downloadedFiles++;
@@ -306,7 +306,7 @@ namespace DDTankFlashDownloader
                 // Download Swf
                 foreach (string file in listSwf.Items)
                 {
-                    string url = $"{txtFlashUrl.Text}ui\\{txtFlashLang.Text}\\swf\\{file}";
+                    string url = $"{txtFlashUrl.Text.TrimEnd('/')}/ui/{txtFlashLang.Text}/swf/{file}";
                     string localPath = Path.Combine(Application.StartupPath, "Downloads", txtFlashName.Text, "ui", txtFlashLang.Text, "swf", file);
                     await DownloadFileSafeAsync(webClient, url, localPath);
                     downloadedFiles++;
@@ -315,7 +315,7 @@ namespace DDTankFlashDownloader
                 // Download Xml
                 foreach (string file in listXml.Items)
                 {
-                    string url = $"{txtFlashUrl.Text}ui\\{txtFlashLang.Text}\\xml\\{file}";
+                    string url = $"{txtFlashUrl.Text.TrimEnd('/')}/ui/{txtFlashLang.Text}/xml/{file}";
                     string localPath = Path.Combine(Application.StartupPath, "Downloads", txtFlashName.Text, "ui", txtFlashLang.Text, "xml", file);
                     await DownloadFileSafeAsync(webClient, url, localPath);
                     downloadedFiles++;
@@ -342,6 +342,15 @@ namespace DDTankFlashDownloader
                     Directory.CreateDirectory(directory);
                 }
                 await webClient.DownloadFileTaskAsync(new Uri(url), localPath);
+                await Task.Delay(100);
+                if (File.Exists(localPath))
+                {
+                    FileInfo fi = new FileInfo(localPath);
+                    if (fi.Length == 0)
+                    {
+                        File.Delete(localPath);
+                    }
+                }
             }
             catch (WebException ex)
             {
@@ -353,6 +362,25 @@ namespace DDTankFlashDownloader
                 {
                     throw;
                 }
+                try
+                {
+                    if (File.Exists(localPath))
+                    {
+                        File.Delete(localPath);
+                    }
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    if (File.Exists(localPath))
+                    {
+                        File.Delete(localPath);
+                    }
+                }
+                catch { }
             }
         }
 
